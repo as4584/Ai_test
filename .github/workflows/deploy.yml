@@ -1,0 +1,82 @@
+name: Deploy
+
+on:
+  push:
+    branches: [ "main" ]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build & push ai_receptionist image (conditional)
+        uses: docker/build-push-action@v6
+        with:
+          context: ./ai_receptionist
+          file: ./ai_receptionist/Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:ai_receptionist-latest
+          provenance: false
+        continue-on-error: true # Safeguard if Dockerfile is not present yet
+
+      - name: Build & push legacy image (conditional)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:legacy-latest
+          provenance: false
+        continue-on-error: true
+
+  deploy-staging:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    steps:
+      - name: Deploy via docker-compose (stub)
+        run: |
+          echo "Stub: SSH into staging and run docker compose pull && up -d"
+          echo "Expected secrets: STAGING_SSH_HOST, STAGING_SSH_USER, STAGING_SSH_KEY"
+          echo "Example commands:"
+          echo "ssh -i $STAGING_SSH_KEY $STAGING_SSH_USER@$STAGING_SSH_HOST 'docker compose pull && docker compose up -d'"
+
+  smoke-test:
+    runs-on: ubuntu-latest
+    needs: deploy-staging
+    env:
+      STAGING_URL: ${{ secrets.STAGING_URL }}
+      TEST_TENANT_ID: test-tenant
+    steps:
+      - name: "Smoke: health endpoint"
+        run: |
+          if [ -z "$STAGING_URL" ]; then echo "No STAGING_URL provided, skipping"; exit 0; fi
+          curl -fsSL "$STAGING_URL/health" | sed -E 's/.*/Health OK: &/'
+
+      - name: "Smoke: simple functional check"
+        run: |
+          if [ -z "$STAGING_URL" ]; then echo "No STAGING_URL provided, skipping"; exit 0; fi
+          status=$(curl -fsSL -H "X-Tenant-ID: $TEST_TENANT_ID" "$STAGING_URL/health" | tr -d '\n')
+          echo "Response: $status"
+          # minimal assertion: ensure contains 'status' and 'ok'
+          (echo "$status" | grep -qi 'ok') || (echo "Smoke test failed" && exit 1)

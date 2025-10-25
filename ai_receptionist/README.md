@@ -107,3 +107,29 @@ When the AI cannot confidently complete a task, the system emits an `escalate` e
   3) Contact the caller (or join live handoff) and resolve.
   4) Record resolution notes and mark the entry closed.
 - Post-incident: Tag recurring reasons (e.g., “payment”, “ambiguous time”), feed back to model/rules to reduce future escalations.
+
+## Infrastructure as Code (IaC) and local dev
+
+- Use Terraform to provision cloud infra: Postgres (OLTP), Redis (queues/cache), and a vector DB (e.g., Pinecone, Qdrant, or OpenSearch KNN). Keep state in a remote backend (S3/GCS) and apply via CI with approvals.
+- For local development, a minimal Docker Compose file is provided at `docker-compose.dev.yml` with Postgres, Redis, and Qdrant:
+  ```bash
+  docker compose -f docker-compose.dev.yml up -d
+  ```
+  Configure your `.env` to point to these local services.
+
+## Feature flags per-tenant
+
+- Model flag configuration per `tenant_id` (e.g., allow_ai_booking, enable_rag, require_human_review) in a `feature_flags` table or config store.
+- Evaluate flags at request time via a cached read (e.g., Redis) to keep latency low; default to safest behavior on cache miss.
+- Rollouts: enable flags for a small subset of tenants first; use observability signals to decide broader rollout.
+
+## Database migrations strategy
+
+- Use Alembic (or Prisma/Flyway) for versioned migrations. Target backward-compatible changes first.
+- Zero-downtime pattern:
+  1) Add new columns/tables in a non-breaking way.
+  2) Deploy app that writes to both old and new (dual-write) if needed.
+  3) Backfill data with a one-off job or migration script.
+  4) Switch reads to the new schema; monitor.
+  5) Remove old columns/paths after a grace period.
+- Maintain per-tenant migrations if multi-tenant isolation requires it (schema-per-tenant). Otherwise use a global shared schema with a `tenant_id` column and partial indexes.
