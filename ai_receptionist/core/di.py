@@ -1,4 +1,5 @@
 from functools import lru_cache
+from typing import Dict
 
 from core.settings import Settings
 from services.telephony.telephony import TelephonyService
@@ -17,3 +18,11 @@ def get_telephony_service(settings: Settings | None = None) -> TelephonyService:
     """
     s = settings or get_settings()
     return TwilioTelephonyService(settings=s)
+
+
+def get_tenant_mapping() -> Dict[str, str]:
+    """Provide a phone-number-to-tenant_id mapping.
+
+    In production, this could come from a database or settings. Overridden in tests.
+    """
+    return {}

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Any, Dict
+from typing import Any, Dict, Mapping
 
 
 class TelephonyService(ABC):
@@ -11,9 +11,11 @@ class TelephonyService(ABC):
     """
 
     @abstractmethod
-    async def handle_webhook(self, payload: Dict[str, Any]) -> Dict[str, Any]:
-        """Handle inbound webhook payloads (voice/SMS).
+    def validate_signature(self, headers: Mapping[str, str], body: bytes, url: str | None = None) -> bool:
+        """Validate webhook signature (easily mockable in unit tests)."""
+        raise NotImplementedError
 
-        Returns a dict with at least a 'message' key.
-        """
+    @abstractmethod
+    async def enqueue_call(self, event: Dict[str, Any]) -> None:
+        """Enqueue an inbound call event (e.g., to Redis)."""
         raise NotImplementedError
