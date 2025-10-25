@@ -133,3 +133,32 @@ When the AI cannot confidently complete a task, the system emits an `escalate` e
   4) Switch reads to the new schema; monitor.
   5) Remove old columns/paths after a grace period.
 - Maintain per-tenant migrations if multi-tenant isolation requires it (schema-per-tenant). Otherwise use a global shared schema with a `tenant_id` column and partial indexes.
+
+## Admin CLI (tools/adminctl.py)
+
+Small Click-based tool for tenant plan and feature flag management. Requires a private key at `~/.adminctl.env`:
+
+```
+ADMIN_PRIVATE_KEY=your-very-secret
+```
+
+Optionally set the API base URL for admin endpoints:
+
+```
+export ADMIN_API_URL=http://localhost:8080
+```
+
+Examples:
+
+```
+# Set plan to core for tenant t1
+python tools/adminctl.py set-plan --tenant t1 --plan core --admin-user lex
+
+# Enable RAG for tenant t1
+python tools/adminctl.py set-flag --tenant t1 --flag allow_rag --enable true --admin-user lex
+
+# Show flags for tenant t1
+python tools/adminctl.py show-flags --tenant t1
+```
+
+The CLI signs a short-lived JWT (HS256) using ADMIN_PRIVATE_KEY and sends it as a Bearer token to /admin endpoints.
