@@ -90,3 +90,20 @@ TWILIO_PHONE_NUMBER=+15551234567
 
 ---
 This scaffold is intentionally minimal but provides strong foundations to extend into a production-grade system.
+
+## Human fallback SRE runbook (on-call + SLA)
+
+When the AI cannot confidently complete a task, the system emits an `escalate` event. A background worker persists this to a `human_fallback` store and notifies a Slack channel for on-call humans.
+
+- Source of truth: `human_fallback` table (or repository) contains tenant_id, caller, reason, created_at, and raw context.
+- Notification: `#human-fallback` Slack channel receives a message with tenant, caller, reason, and entry_id.
+- On-call rotation: Assign an on-call engineer or support agent with Slack push notifications enabled. Use a shared runbook and escalation policy (PagerDuty/Slack).
+- SLA guidance:
+  - Critical/Live-call: Acknowledge within 2 minutes, engage caller in < 5 minutes.
+  - Standard: Acknowledge within 15 minutes, follow-up within 1 hour.
+- Procedure:
+  1) Open the latest Slack notification, copy `entry_id`.
+  2) Retrieve full context from `human_fallback` by `entry_id`.
+  3) Contact the caller (or join live handoff) and resolve.
+  4) Record resolution notes and mark the entry closed.
+- Post-incident: Tag recurring reasons (e.g., “payment”, “ambiguous time”), feed back to model/rules to reduce future escalations.
