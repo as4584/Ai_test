@@ -1,40 +1,41 @@
 """
-Business configuration - Template for easy customization.
+Business configuration for Carolann M. Aschoff, P.C.
 
-TODO: Copy this file for each new client and update all values below.
+Family law practice in Jersey City, NJ.
 """
 
 # ===== BUSINESS IDENTITY =====
-BUSINESS_NAME = "YOUR_BUSINESS_NAME"  # e.g., "Acme Salon" or "Smith Law Office"
+BUSINESS_NAME = "Carolann M. Aschoff, P.C."
 
 # ===== SERVICES OFFERED =====
 SERVICES = [
-    # Format: {"name": "Service Name", "price": "Price or 'varies'"}
-    {"name": "SERVICE_1", "price": "$XX"},
-    {"name": "SERVICE_2", "price": "$YY"},
-    {"name": "SERVICE_3", "price": "varies"},
+    {"name": "Divorce and Separation", "price": "varies"},
+    {"name": "Child Custody and Support", "price": "varies"},
+    {"name": "Domestic Violence and Mediation", "price": "varies"},
+    {"name": "Wills and Estate Planning", "price": "varies"},
 ]
 
 # ===== BUSINESS HOURS =====
 HOURS = {
     "weekday": "Monday – Friday: 9:00 AM – 5:00 PM",
     "weekend": "Saturday & Sunday: Closed",
-    "notes": "Evening appointments available by request",
+    "notes": "Evening appointments available by request at our Jersey City office",
 }
 
 # ===== STAFF =====
 STAFF = [
-    {"role": "ROLE_1", "name": "FULL_NAME_1"},
-    {"role": "ROLE_2", "name": "FULL_NAME_2"},
+    {"role": "Founding Attorney", "name": "Carolann M. Aschoff"},
+    {"role": "Associate Attorney", "name": "Annmarie Jensen"},
+    {"role": "Administrative Team", "name": "Experienced support staff"},
 ]
 
 # ===== OFFICE LOCATION(S) =====
-LOCATION = "CITY, STATE"  # e.g., "Jersey City, NJ"
+LOCATION = "Jersey City, NJ"
 
 # ===== CONTACT INFO =====
-PHONE = "+1XXXXXXXXXX"
-EMAIL = "contact@yourbusiness.com"
+PHONE = "+15551234567"  # TODO: Replace with actual phone number
+EMAIL = "info@aschofflaw.com"  # TODO: Replace with actual email
 
 # ===== ESCALATION =====
-ESCALATION_CONTACT = "STAFF_NAME"  # Who to transfer to for human help
-ESCALATION_PHONE = "+1XXXXXXXXXX"  # Optional: number to dial for transfer
+ESCALATION_CONTACT = "Front Desk"
+ESCALATION_PHONE = "+15551234567"  # TODO: Replace with actual phone number
