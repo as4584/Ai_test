@@ -35,7 +35,7 @@ async def twilio_webhook(
 ):
     # Read raw body for signature validation (mockable in tests)
     body_bytes = await request.body()
-    if not telephony.validate_signature(request.headers, body_bytes, url=None):
+    if not telephony.validate_signature(request.headers, body_bytes, url=str(request.url)):
         return Response(status_code=status.HTTP_403_FORBIDDEN)
 
     # Parse payload (Twilio sends application/x-www-form-urlencoded for voice calls)

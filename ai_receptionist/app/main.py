@@ -4,6 +4,8 @@ from fastapi.responses import JSONResponse
 from core.di import get_settings
 from core.settings import Settings
 from app.api.twilio import router as twilio_router
+from app.api.admin import router as admin_router
+from services.voice.endpoints import router as voice_router
 from app.middleware import configure_logging, request_context_middleware
 
 
@@ -22,6 +24,8 @@ def root():
 
 # Mount routers
 app.include_router(twilio_router)
+app.include_router(admin_router)
+app.include_router(voice_router)
 
 # Observability: attach request id and tenant id to context and logs
 configure_logging()

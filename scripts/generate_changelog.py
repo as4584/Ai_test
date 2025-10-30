@@ -65,6 +65,7 @@ def main() -> int:
     ap.add_argument("--from", dest="from_tag", default=None, help="Start tag (optional)")
     ap.add_argument("--to", dest="to_ref", default="HEAD", help="End ref (default HEAD)")
     ap.add_argument("--output", dest="output", default="-", help="Output file or - for stdout")
+    ap.add_argument("--changelog", dest="changelog", default="CHANGELOG.md", help="Changelog file to append to")
     args = ap.parse_args()
 
     version = os.environ.get("GITHUB_REF_NAME", "Unreleased")
@@ -79,11 +80,26 @@ def main() -> int:
     sections = categorize(titles)
     out = render(version, sections)
 
-    if args.output == "-":
-        sys.stdout.write(out)
-    else:
+    # Always print the generated release notes
+    sys.stdout.write(out)
+
+    # Optionally write to a separate output file (e.g., RELEASE_NOTES.md)
+    if args.output != "-":
         with open(args.output, "w", encoding="utf-8") as f:
             f.write(out)
+
+    # Append an entry to CHANGELOG.md with version and date
+    from datetime import date
+
+    header = f"## {version} - {date.today().isoformat()}\n\n"
+    try:
+        with open(args.changelog, "a", encoding="utf-8") as cf:
+            cf.write(header)
+            cf.write(out)
+            cf.write("\n")
+    except Exception:
+        # Best-effort; do not fail the release on changelog write
+        pass
     return 0
 
 

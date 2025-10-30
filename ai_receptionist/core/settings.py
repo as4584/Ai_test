@@ -15,6 +15,10 @@ try:
         twilio_auth_token: Optional[str] = None
         twilio_phone_number: Optional[str] = None
 
+        # Infra
+        redis_url: Optional[str] = None
+        admin_private_key: Optional[str] = None
+
         model_config = SettingsConfigDict(env_file=".env", env_prefix="", case_sensitive=False)
 
 except Exception:  # pragma: no cover - fallback when pydantic-settings not available
@@ -26,4 +30,6 @@ except Exception:  # pragma: no cover - fallback when pydantic-settings not avai
         twilio_account_sid: Optional[str] = os.getenv("TWILIO_ACCOUNT_SID")
         twilio_auth_token: Optional[str] = os.getenv("TWILIO_AUTH_TOKEN")
         twilio_phone_number: Optional[str] = os.getenv("TWILIO_PHONE_NUMBER")
+        redis_url: Optional[str] = os.getenv("REDIS_URL")
+        admin_private_key: Optional[str] = os.getenv("ADMIN_PRIVATE_KEY")
 

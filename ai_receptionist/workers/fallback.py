@@ -73,6 +73,23 @@ class FakeSlackNotifier:
         self.sent.append({"channel": channel, "text": text})
 
 
+class SlackWebhookNotifier:
+    """Minimal Slack webhook notifier (sync wrapper around httpx)."""
+
+    def __init__(self, webhook_url: str):
+        self._webhook_url = webhook_url
+
+    def notify(self, channel: str, text: str) -> None:
+        try:
+            import requests
+
+            payload = {"text": f"[{channel}] {text}"}
+            requests.post(self._webhook_url, json=payload, timeout=5)
+        except Exception:
+            # best-effort; do not raise in worker path
+            pass
+
+
 @dataclass
 class FallbackWorker:
     repo: FallbackRepository

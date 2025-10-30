@@ -76,3 +76,13 @@ twilio
 python-dotenv
 
 python-multipart
+
+# Migrations and DB tooling for tests
+SQLAlchemy==2.0.36
+alembic==1.13.2
+
+# Redis support (optional runtime for queues)
+redis==5.0.6
+
+# Pydantic settings for v2
+pydantic-settings==2.4.0
