@@ -6,8 +6,8 @@ from typing import Dict
 import jwt
 from fastapi import APIRouter, Depends, Header, HTTPException
 
-from core.di import get_feature_flag_service
-from services.flags.service import FeatureFlagService
+from ai_receptionist.core.di import get_feature_flag_service
+from ai_receptionist.services.flags.service import FeatureFlagService
 
 
 router = APIRouter(prefix="/admin", tags=["admin"])

@@ -1,10 +1,10 @@
 from functools import lru_cache
 from typing import Dict, Optional
 
-from core.settings import Settings
-from services.telephony.telephony import TelephonyService
-from services.telephony.twilio_service import TwilioTelephonyService
-from services.flags.service import FeatureFlagService, FeatureFlagRepository, RedisLike
+from ai_receptionist.core.settings import Settings
+from ai_receptionist.services.telephony.telephony import TelephonyService
+from ai_receptionist.services.telephony.twilio_service import TwilioTelephonyService
+from ai_receptionist.services.flags.service import FeatureFlagService, FeatureFlagRepository, RedisLike
 
 
 @lru_cache(maxsize=1)

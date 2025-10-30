@@ -5,7 +5,7 @@ from typing import Any, Dict
 
 import pytest
 
-from services.flags.service import FeatureFlagService, FeatureFlagRepository, RedisLike, CACHE_TTL_SECONDS
+from ai_receptionist.services.flags.service import FeatureFlagService, FeatureFlagRepository, RedisLike, CACHE_TTL_SECONDS
 
 
 class FakeRedis(RedisLike):

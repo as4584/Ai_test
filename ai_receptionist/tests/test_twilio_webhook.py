@@ -6,9 +6,9 @@ from typing import Any, Dict, List, Mapping
 import pytest
 from fastapi.testclient import TestClient
 
-from app.main import app
-from core.di import get_telephony_service
-from services.telephony.telephony import TelephonyService
+from ai_receptionist.app.main import app
+from ai_receptionist.core.di import get_telephony_service
+from ai_receptionist.services.telephony.telephony import TelephonyService
 
 
 class FakeTelephonyService(TelephonyService):

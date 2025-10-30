@@ -1,12 +1,12 @@
 from fastapi import FastAPI, Depends
 from fastapi.responses import JSONResponse
 
-from core.di import get_settings
-from core.settings import Settings
-from app.api.twilio import router as twilio_router
-from app.api.admin import router as admin_router
-from services.voice.endpoints import router as voice_router
-from app.middleware import configure_logging, request_context_middleware
+from ai_receptionist.core.di import get_settings
+from ai_receptionist.core.settings import Settings
+from ai_receptionist.app.api.twilio import router as twilio_router
+from ai_receptionist.app.api.admin import router as admin_router
+from ai_receptionist.services.voice.endpoints import router as voice_router
+from ai_receptionist.app.middleware import configure_logging, request_context_middleware
 
 
 app = FastAPI(title="AI Receptionist", version="0.1.0")

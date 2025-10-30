@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from decimal import Decimal
 
-from services.billing import (
+from ai_receptionist.services.billing import (
     BillingService,
     InMemoryBillingRepository,
     FakeStripeClient,

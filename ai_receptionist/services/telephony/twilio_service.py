@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from typing import Any, Dict, Mapping, Optional, List
 
-from core.settings import Settings
-from services.telephony.telephony import TelephonyService
+from ai_receptionist.core.settings import Settings
+from ai_receptionist.services.telephony.telephony import TelephonyService
 
 try:  # Optional import to avoid hard dependency in tests
     from twilio.request_validator import RequestValidator

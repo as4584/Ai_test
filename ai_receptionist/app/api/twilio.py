@@ -20,8 +20,8 @@ from typing import Any, Dict
 
 from fastapi import APIRouter, Depends, Request, Response, status
 
-from core.di import get_telephony_service, get_tenant_mapping
-from services.telephony.telephony import TelephonyService
+from ai_receptionist.core.di import get_telephony_service, get_tenant_mapping
+from ai_receptionist.services.telephony.telephony import TelephonyService
 
 
 router = APIRouter()

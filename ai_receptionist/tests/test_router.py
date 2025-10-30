@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import pytest
 
-from services.router import IntentRouter, BookingStrategy, FAQStrategy, EscalationStrategy
+from ai_receptionist.services.router import IntentRouter, BookingStrategy, FAQStrategy, EscalationStrategy
 
 
 @pytest.mark.parametrize(

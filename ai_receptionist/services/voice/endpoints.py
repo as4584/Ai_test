@@ -6,6 +6,18 @@ Handles incoming calls, language selection, and conversation flow.
 
 from fastapi import APIRouter, Form, Request, Response
 from twilio.twiml.voice_response import VoiceResponse, Gather
+import sys
+import os
+
+# Add project root to path for call_monitor import
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))))
+
+try:
+    from call_monitor import monitor
+    MONITOR_ENABLED = True
+except ImportError:
+    MONITOR_ENABLED = False
+    monitor = None
 
 from .business_config import BUSINESS_NAME
 from .session import get_session, clear_session
@@ -18,11 +30,15 @@ router = APIRouter(prefix="/twilio", tags=["voice"])
 
 
 @router.post("/voice")
-async def voice_entry(request: Request, CallSid: str = Form(...)):
+async def voice_entry(request: Request, CallSid: str = Form(...), From: str = Form(None)):
     """
     Entry point for incoming calls.
     Presents language selection (English or Spanish).
     """
+    # Log incoming call to monitor
+    if MONITOR_ENABLED and monitor:
+        monitor.log_incoming_call(CallSid, From)
+    
     # Initialize cost tracking
     tracker = get_cost_tracker(CallSid)
     tracker.log_inbound_call(duration_seconds=0)  # Will track actual duration at call end
@@ -39,6 +55,10 @@ async def voice_entry(request: Request, CallSid: str = Form(...)):
     # Bilingual prompt
     gather.say(LANGUAGE_SELECTION_COMBINED, language="en")
     tracker.log_tts(LANGUAGE_SELECTION_COMBINED)
+    
+    # Log AI greeting to monitor
+    if MONITOR_ENABLED and monitor:
+        monitor.log_ai_response(CallSid, LANGUAGE_SELECTION_COMBINED, "language_selection")
 
     resp.append(gather)
 
@@ -65,6 +85,10 @@ async def language_selected(request: Request, CallSid: str = Form(...), Digits: 
     else:
         # Default to English if unclear
         session.language = "en"
+    
+    # Log language selection to monitor
+    if MONITOR_ENABLED and monitor:
+        monitor.log_language_selection(CallSid, session.language)
 
     # Greet caller
     greeting = get_message("GREETING", session.language, business_name=BUSINESS_NAME)
@@ -79,6 +103,10 @@ async def language_selected(request: Request, CallSid: str = Form(...), Digits: 
     )
     gather.say(greeting, language="en" if session.language == "en" else "es")
     tracker.log_tts(greeting)
+    
+    # Log AI greeting to monitor
+    if MONITOR_ENABLED and monitor:
+        monitor.log_ai_response(CallSid, greeting, "greeting")
 
     resp.append(gather)
 
@@ -99,6 +127,10 @@ async def gather_input(request: Request, CallSid: str = Form(...), SpeechResult:
 
     if SpeechResult:
         tracker.log_speech_recognition()
+        
+        # Log user input to monitor
+        if MONITOR_ENABLED and monitor:
+            monitor.log_user_input(CallSid, SpeechResult)
 
     user_input = SpeechResult or ""
     intent = detect_intent(user_input, session.language)
@@ -107,6 +139,10 @@ async def gather_input(request: Request, CallSid: str = Form(...), SpeechResult:
     # Track conversation
     session.add_turn(user_input, bot_response)
     session.current_intent = intent
+    
+    # Log AI response to monitor
+    if MONITOR_ENABLED and monitor:
+        monitor.log_ai_response(CallSid, bot_response, intent)
 
     # Build TwiML response
     resp = VoiceResponse()
@@ -117,9 +153,14 @@ async def gather_input(request: Request, CallSid: str = Form(...), SpeechResult:
         resp.hangup()
 
         # Log call summary
+        summary = tracker.summary()
         print("\n" + "=" * 50)
-        print(tracker.summary())
+        print(summary)
         print("=" * 50 + "\n")
+        
+        # Log call end to monitor
+        if MONITOR_ENABLED and monitor:
+            monitor.log_call_end(CallSid, "user_goodbye")
 
         # Clean up session
         clear_session(CallSid)
@@ -153,6 +194,10 @@ async def repeat_last(request: Request, CallSid: str = Form(...)):
     tracker = get_cost_tracker(CallSid)
 
     unclear_msg = get_message("UNCLEAR_RESPONSE", session.language)
+    
+    # Log to monitor
+    if MONITOR_ENABLED and monitor:
+        monitor.log_ai_response(CallSid, unclear_msg, "unclear")
 
     resp = VoiceResponse()
     gather = Gather(
@@ -175,9 +220,14 @@ async def repeat_last(request: Request, CallSid: str = Form(...)):
         resp.hangup()
 
         # Log summary
+        summary = tracker.summary()
         print("\n" + "=" * 50)
-        print(tracker.summary())
+        print(summary)
         print("=" * 50 + "\n")
+        
+        # Log call end to monitor
+        if MONITOR_ENABLED and monitor:
+            monitor.log_call_end(CallSid, "too_many_retries")
 
         clear_session(CallSid)
     else:
