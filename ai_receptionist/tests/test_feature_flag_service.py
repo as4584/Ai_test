@@ -1,9 +1,8 @@
 from __future__ import annotations
 
 import json
-from typing import Any, Dict
+from typing import Dict
 
-import pytest
 
 from ai_receptionist.services.flags.service import FeatureFlagService, FeatureFlagRepository, RedisLike, CACHE_TTL_SECONDS
 

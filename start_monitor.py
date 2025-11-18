@@ -8,9 +8,7 @@ showing real-time transcripts in the terminal.
 
 import sys
 import os
-import subprocess
 import signal
-import time
 
 # Add project root to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -39,7 +37,7 @@ def main():
         monitor.log_info("Please set your Twilio credentials in .env file")
         sys.exit(1)
     
-    monitor.log_info(f"Starting FastAPI server on http://localhost:8000")
+    monitor.log_info("Starting FastAPI server on http://localhost:8000")
     monitor.log_info("Twilio webhook URL: http://localhost:8000/twilio/voice")
     monitor.log_info("For external access, use ngrok: ngrok http 8000")
     monitor.print_separator()

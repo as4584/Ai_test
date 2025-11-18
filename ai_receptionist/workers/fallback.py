@@ -1,5 +1,9 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from typing import Any, Dict, List, Optional, Protocol
+
 """
 Human fallback worker that consumes escalate events and persists them for human handling.
 
@@ -8,10 +12,6 @@ Design:
 - Dependency Injection: SlackNotifier is injected so tests can assert notifications without network calls.
 - Queue Adapter: FallbackQueue abstracts the source of events (Redis, SQS, etc.). For tests we use an in-memory list.
 """
-
-from dataclasses import dataclass
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional, Protocol
 
 
 class FallbackRepository(Protocol):

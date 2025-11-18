@@ -44,7 +44,6 @@ def override_telephony_dependency(mocked_redis_queue):
     def _provider():
         return FakeTelephonyService(queue=mocked_redis_queue)
 
-    from core import di
 
     app.dependency_overrides[get_telephony_service] = _provider
     yield

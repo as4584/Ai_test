@@ -39,7 +39,7 @@ print("TESTING 'OTHER' INTENT HANDLING")
 print("=" * 60)
 
 response, action = handle_intent("other", "en", "blah blah blah")
-print(f"\nIntent: other")
+print("\nIntent: other")
 print(f"Action: {action} (should be 'gather', NOT 'hangup')")
 print(f"Response: {response}")
 

@@ -15,10 +15,9 @@ Copilot, when I ask for new tests, generate both:
 """
 
 import json
-import os
 import pytest
 from typing import Dict, List, Any
-from src.haircut_bot import HaircutConciergeBot, ToolCall
+from src.haircut_bot import HaircutConciergeBot
 
 def load_fixture(fixture_name: str) -> Dict[str, Any]:
     """Load a JSON fixture from docs/samples/"""
@@ -36,7 +35,6 @@ def validate_booking_flow(bot: HaircutConciergeBot, dialogue: List[Dict], valida
     bot.reset()  # Start fresh
     tool_calls = []
     confirmation_given = False
-    booking_attempted = False
     last_response = ""
     
     for i, turn in enumerate(dialogue):
@@ -54,7 +52,6 @@ def validate_booking_flow(bot: HaircutConciergeBot, dialogue: List[Dict], valida
                 # Verify that a tool call was made during the last user interaction
                 current_tool_calls = bot.get_tool_calls()
                 if current_tool_calls and len(current_tool_calls) > len(tool_calls):
-                    booking_attempted = True
                     tool_calls = current_tool_calls
                     
                     # Validate: confirmation should happen before booking (for booking actions)

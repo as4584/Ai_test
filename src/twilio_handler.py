@@ -8,7 +8,7 @@ import logging
 from typing import Optional
 from fastapi import FastAPI, Form, Request
 from fastapi.responses import Response
-from twilio.twiml.voice_response import VoiceResponse, Gather
+from twilio.twiml.voice_response import VoiceResponse
 from dotenv import load_dotenv
 
 from src.haircut_bot import HaircutConciergeBot
@@ -41,7 +41,7 @@ def make_gather_response(text: str, loop_back: bool = True) -> str:
     response = VoiceResponse()
     response.say(text)
     
-    gather = response.gather(
+    _ = response.gather(  # Gather is attached to response
         input='speech',
         action='/twilio/handle' if loop_back else None,
         speech_timeout='3',

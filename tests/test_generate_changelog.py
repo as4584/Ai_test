@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import os
-from types import SimpleNamespace
 
 import scripts.generate_changelog as gc
 
@@ -49,7 +48,6 @@ def test_main_prints_and_writes(monkeypatch, tmp_path):
     cwd = os.getcwd()
     os.chdir(tmp_path)
     try:
-        rc = gc.main.__wrapped__(gc.main) if hasattr(gc.main, "__wrapped__") else None
         # Call main via its function
         # Use args by simulating CLI via monkeypatching sys.argv is fragile; instead call helpers
         # We'll directly invoke generate and write manually to mimic main

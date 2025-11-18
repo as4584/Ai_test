@@ -80,12 +80,12 @@ class CostTracker:
             f"{'='*60}",
             f"Duration: {duration:.1f}s",
             f"Operations: {len(self.operations)}",
-            f"",
+            "",
             "Cost Breakdown:",
         ]
         for op_type, cost in breakdown.items():
             lines.append(f"  {op_type}: ${cost:.4f}")
-        lines.append(f"")
+        lines.append("")
         lines.append(f"TOTAL COST: ${total:.4f}")
         lines.append(f"{'='*60}\n")
         return "\n".join(lines)

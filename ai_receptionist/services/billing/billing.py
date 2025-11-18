@@ -1,5 +1,10 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from decimal import Decimal, ROUND_HALF_UP
+from typing import Protocol, List, Dict, Any, Optional, Tuple
+
 """
 Billing service with metered usage and Stripe invoice creation.
 
@@ -10,11 +15,6 @@ Design notes:
   plus a monthly recurring charge (MRC). Consider soft/hard caps to avoid surprise costs.
 - Rounding: currency math uses Decimal; cents are computed by quantizing to 2 decimals.
 """
-
-from dataclasses import dataclass
-from datetime import datetime, timezone
-from decimal import Decimal, ROUND_HALF_UP
-from typing import Protocol, List, Dict, Any, Optional, Tuple
 
 
 class BillingRepository(Protocol):

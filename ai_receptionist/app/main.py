@@ -1,7 +1,6 @@
 from fastapi import FastAPI, Depends
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
-import os
 from pathlib import Path
 
 from ai_receptionist.core.di import get_settings

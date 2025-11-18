@@ -9,7 +9,6 @@ if __name__ == "__main__":
     # Test imports
     try:
         from src.twilio_handler import app
-        from src.voice_server import setup_application
         from src.calendar_handler import get_calendar_adapter
         print("✅ All imports successful")
     except Exception as e:
@@ -40,14 +39,14 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"❌ FastAPI app error: {e}")
     
-    print(f"\n🚀 Ready to start voice server with:")
-    print(f"   uvicorn src.twilio_handler:app --host 0.0.0.0 --port 8000")
-    print(f"\n🔗 Webhook URLs for Twilio configuration:")
-    print(f"   Voice URL: https://your-domain.com/twilio/voice")
-    print(f"   Status Callback: https://your-domain.com/twilio/handle")
+    print("\n🚀 Ready to start voice server with:")
+    print("   uvicorn src.twilio_handler:app --host 0.0.0.0 --port 8000")
+    print("\n🔗 Webhook URLs for Twilio configuration:")
+    print("   Voice URL: https://your-domain.com/twilio/voice")
+    print("   Status Callback: https://your-domain.com/twilio/handle")
     
-    print(f"\n📋 Next steps for production:")
-    print(f"   1. Set up ngrok or deploy to cloud provider")
-    print(f"   2. Configure Twilio phone number with webhook URLs")
-    print(f"   3. Replace calendar stub with Google Calendar API")
-    print(f"   4. Add OpenAI Realtime Voice integration (stubs provided)")
+    print("\n📋 Next steps for production:")
+    print("   1. Set up ngrok or deploy to cloud provider")
+    print("   2. Configure Twilio phone number with webhook URLs")
+    print("   3. Replace calendar stub with Google Calendar API")
+    print("   4. Add OpenAI Realtime Voice integration (stubs provided)")

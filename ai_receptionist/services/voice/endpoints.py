@@ -47,7 +47,7 @@ async def voice_entry(request: Request, CallSid: str = Form(...), From: str = Fo
     resp = VoiceResponse()
     gather = Gather(
         num_digits=1,
-        action=f"/twilio/language-selected",
+        action="/twilio/language-selected",
         method="POST",
         timeout=5,
     )

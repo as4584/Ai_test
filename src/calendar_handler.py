@@ -6,7 +6,7 @@ Local JSON stub for testing, designed for Google Calendar integration
 import json
 import os
 import logging
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from typing import Protocol, List, Dict, Any, runtime_checkable
 
 logger = logging.getLogger(__name__)
@@ -234,7 +234,7 @@ def ensure_data_file(data_file: str = "data/appointments.json") -> None:
     Args:
         data_file: Path to the data file
     """
-    adapter = GoogleCalendarAdapter(data_file)
+    _ = GoogleCalendarAdapter(data_file)  # Initialize to ensure file exists
     logger.info(f"Data file ensured: {data_file}")
 
 def get_calendar_adapter() -> CalendarPort:

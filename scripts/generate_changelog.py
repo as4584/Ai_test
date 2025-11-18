@@ -24,7 +24,7 @@ def previous_tag() -> str | None:
 def commit_titles(rng: str) -> List[str]:
     try:
         out = run(["git", "log", "--pretty=%s", rng])
-        return [l for l in out.split("\n") if l.strip()]
+        return [line for line in out.split("\n") if line.strip()]
     except Exception:
         return []
 
@@ -34,12 +34,18 @@ def categorize(titles: List[str]) -> Dict[str, List[str]]:
     for t in titles:
         key = "other"
         lower = t.lower()
-        if lower.startswith("feat"): key = "features"
-        elif lower.startswith("fix"): key = "fixes"
-        elif lower.startswith("docs"): key = "docs"
-        elif lower.startswith("refactor"): key = "refactors"
-        elif lower.startswith("perf"): key = "performance"
-        elif lower.startswith("test"): key = "tests"
+        if lower.startswith("feat"):
+            key = "features"
+        elif lower.startswith("fix"):
+            key = "fixes"
+        elif lower.startswith("docs"):
+            key = "docs"
+        elif lower.startswith("refactor"):
+            key = "refactors"
+        elif lower.startswith("perf"):
+            key = "performance"
+        elif lower.startswith("test"):
+            key = "tests"
         sections[key].append(t)
     return sections
 

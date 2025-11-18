@@ -4,11 +4,9 @@ This module provides a simulation environment for testing conversation flows
 without making real API calls.
 """
 
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Any
 from dataclasses import dataclass
-import json
 import re
-from datetime import datetime
 
 @dataclass
 class ToolCall:
@@ -284,7 +282,7 @@ class HaircutConciergeBot:
         
         # Check for vague time requests
         if self._is_vague_time(message_lower):
-            return f"I'd be happy to help you book a haircut! Could you specify which day this week and what time would work best for you?"
+            return "I'd be happy to help you book a haircut! Could you specify which day this week and what time would work best for you?"
         
         # If user is confirming booking
         if self.booking_state["confirmed"] and not missing_info and self.booking_state["action_type"] == "book":

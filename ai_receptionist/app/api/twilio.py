@@ -1,5 +1,13 @@
 from __future__ import annotations
 
+import time
+from typing import Any, Dict
+
+from fastapi import APIRouter, Depends, Request, Response, status
+
+from ai_receptionist.core.di import get_telephony_service, get_tenant_mapping
+from ai_receptionist.services.telephony.telephony import TelephonyService
+
 """
 Twilio webhook router
 
@@ -14,14 +22,6 @@ Mocking in CI:
 - validate_signature should be mocked to return True/False in unit tests.
 - Redis enqueue is simulated by an in-memory list via the TelephonyService test double.
 """
-
-import time
-from typing import Any, Dict
-
-from fastapi import APIRouter, Depends, Request, Response, status
-
-from ai_receptionist.core.di import get_telephony_service, get_tenant_mapping
-from ai_receptionist.services.telephony.telephony import TelephonyService
 
 
 router = APIRouter()

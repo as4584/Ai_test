@@ -9,7 +9,6 @@ import sys
 import time
 from datetime import datetime
 from typing import Dict, Optional
-from collections import defaultdict
 
 # ANSI color codes for terminal
 class Colors:

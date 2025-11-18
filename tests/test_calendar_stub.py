@@ -8,7 +8,6 @@ import json
 import tempfile
 import os
 from datetime import date, datetime, timedelta
-from pathlib import Path
 
 from src.calendar_handler import GoogleCalendarAdapter, ensure_data_file, get_calendar_adapter
 
@@ -47,6 +46,9 @@ def test_ensure_data_file_creates_file():
 def test_calendar_adapter_initialization(temp_data_file):
     """Test that GoogleCalendarAdapter initializes correctly"""
     adapter = GoogleCalendarAdapter(temp_data_file)
+    
+    # Adapter should be created
+    assert adapter is not None
     
     # Data file should be created
     assert os.path.exists(temp_data_file)

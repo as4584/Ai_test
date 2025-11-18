@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from dataclasses import dataclass
-from typing import Any, Dict, Optional, Protocol
+from typing import Dict, Optional, Protocol
 
 
 CACHE_TTL_SECONDS = 30

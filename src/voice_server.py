@@ -35,7 +35,6 @@ def setup_application():
     logger.info("Application setup complete")
 
 # Import the FastAPI app
-from src.twilio_handler import app
 
 # Setup on import
 setup_application()
