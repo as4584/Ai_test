@@ -18,39 +18,71 @@ def detect_intent(user_input: str, language: str = "en") -> str:
         language: "en" or "es"
 
     Returns:
-        Intent name: "availability", "services", "hours", "staff", "pricing", "unclear", "goodbye", "other"
+        Intent name: "availability", "services", "hours", "staff", "pricing", "unclear", "goodbye", "help_menu", "other"
     """
     user_input_lower = user_input.lower()
 
-    # Availability keywords
-    if any(word in user_input_lower for word in ["appointment", "schedule", "available", "availability", "book", "cita", "disponibilidad"]):
+    # Availability keywords - expanded
+    if any(word in user_input_lower for word in [
+        "appointment", "schedule", "available", "availability", "book", "booking", "reserve", "reservation",
+        "meet", "meeting", "consultation", "consult", "slot", "time slot", "visit",
+        "cita", "disponibilidad", "reserva", "reunión", "consulta"
+    ]):
         return "availability"
 
-    # Services keywords
-    if any(word in user_input_lower for word in ["service", "services", "help with", "do you offer", "servicio", "servicios", "ofrecen"]):
+    # Services keywords - expanded
+    if any(word in user_input_lower for word in [
+        "service", "services", "help with", "do you offer", "can you help", "need help",
+        "what do you do", "what can you", "practice area", "specialize", "handle",
+        "divorce", "custody", "estate", "will", "domestic violence", "family law",
+        "servicio", "servicios", "ofrecen", "pueden ayudar", "qué hacen", "especialidad"
+    ]):
         return "services"
 
-    # Hours keywords
-    if any(word in user_input_lower for word in ["hours", "open", "close", "when are you", "horario", "abierto", "cerrado", "cuándo"]):
+    # Hours keywords - expanded
+    if any(word in user_input_lower for word in [
+        "hours", "open", "close", "closed", "when are you", "what time", "business hours",
+        "operating hours", "available when", "schedule",
+        "horario", "abierto", "cerrado", "cuándo", "qué hora"
+    ]):
         return "hours"
 
-    # Staff keywords
-    if any(word in user_input_lower for word in ["staff", "attorney", "lawyer", "team", "who works", "abogado", "equipo", "quién"]):
+    # Staff keywords - expanded
+    if any(word in user_input_lower for word in [
+        "staff", "attorney", "lawyer", "team", "who works", "who is", "who can",
+        "partner", "associate", "counsel", "paralegal", "legal team",
+        "abogado", "abogada", "equipo", "quién", "personal"
+    ]):
         return "staff"
 
-    # Pricing keywords
-    if any(word in user_input_lower for word in ["price", "cost", "fee", "how much", "precio", "costo", "cuánto"]):
+    # Pricing keywords - expanded
+    if any(word in user_input_lower for word in [
+        "price", "prices", "cost", "costs", "fee", "fees", "how much", "charge", "charges",
+        "rate", "rates", "payment", "afford", "expensive", "budget",
+        "precio", "precios", "costo", "costos", "cuánto", "tarifa", "pago"
+    ]):
         return "pricing"
 
-    # Goodbye keywords
-    if any(word in user_input_lower for word in ["goodbye", "bye", "thank you", "thanks", "that's all", "adiós", "gracias", "eso es todo"]):
+    # General help/menu request
+    if any(word in user_input_lower for word in [
+        "help", "options", "menu", "what can", "tell me about", "information",
+        "ayuda", "opciones", "menú", "información"
+    ]):
+        return "help_menu"
+
+    # Goodbye keywords - expanded
+    if any(word in user_input_lower for word in [
+        "goodbye", "bye", "thank", "thanks", "that's all", "that is all", "no more",
+        "done", "finished", "nothing else", "have a good",
+        "adiós", "gracias", "eso es todo", "nada más", "terminé"
+    ]):
         return "goodbye"
 
     # Unclear (very short or garbled)
     if len(user_input_lower.strip()) < 3:
         return "unclear"
 
-    # Default
+    # Default - but this will now be handled better
     return "other"
 
 
@@ -108,6 +140,10 @@ def handle_intent(intent: str, language: str = "en", user_input: str = "") -> Tu
         response = get_message("GOODBYE", language, business_name=BUSINESS_NAME)
         return response, "hangup"
 
-    else:  # "other"
-        response = get_message("ESCALATION_RESPONSE", language)
-        return response, "hangup"
+    elif intent == "help_menu":
+        response = get_message("HELP_MENU", language)
+        return response, "gather"
+
+    else:  # "other" - Try to help instead of immediately escalating
+        response = get_message("CLARIFICATION_REQUEST", language)
+        return response, "gather"

@@ -188,12 +188,18 @@ async def gather_input(request: Request, CallSid: str = Form(...), SpeechResult:
 async def repeat_last(request: Request, CallSid: str = Form(...)):
     """
     Handle unclear audio or no input.
-    Asks user to repeat.
+    Asks user to repeat with helpful guidance.
     """
     session = get_session(CallSid)
     tracker = get_cost_tracker(CallSid)
 
-    unclear_msg = get_message("UNCLEAR_RESPONSE", session.language)
+    # Progressive help - get more specific each time
+    if session.turn_count == 1:
+        unclear_msg = get_message("UNCLEAR_RESPONSE", session.language)
+    elif session.turn_count <= 3:
+        unclear_msg = get_message("HELP_MENU", session.language)
+    else:
+        unclear_msg = get_message("CLARIFICATION_REQUEST", session.language)
     
     # Log to monitor
     if MONITOR_ENABLED and monitor:
@@ -212,8 +218,12 @@ async def repeat_last(request: Request, CallSid: str = Form(...)):
 
     resp.append(gather)
 
-    # If still no input after 3 tries, hang up
-    if session.turn_count > 3:
+    # Only give up after 6 tries (doubled from 3)
+    if session.turn_count > 6:
+        escalation_msg = get_message("ESCALATION_RESPONSE", session.language)
+        resp.say(escalation_msg, language="en" if session.language == "en" else "es")
+        tracker.log_tts(escalation_msg)
+        
         goodbye = get_message("GOODBYE", session.language, business_name=BUSINESS_NAME)
         resp.say(goodbye, language="en" if session.language == "en" else "es")
         tracker.log_tts(goodbye)

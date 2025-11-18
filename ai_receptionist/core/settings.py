@@ -19,7 +19,12 @@ try:
         redis_url: Optional[str] = None
         admin_private_key: Optional[str] = None
 
-        model_config = SettingsConfigDict(env_file=".env", env_prefix="", case_sensitive=False)
+        model_config = SettingsConfigDict(
+            env_file=".env", 
+            env_prefix="", 
+            case_sensitive=False,
+            extra="ignore"  # Ignore extra fields from .env
+        )
 
 except Exception:  # pragma: no cover - fallback when pydantic-settings not available
     # Lightweight fallback to avoid import errors if dependency isn't installed yet.

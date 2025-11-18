@@ -57,10 +57,24 @@ UNCLEAR_RESPONSE: Dict[str, str] = {
 }
 
 
-# Escalation
+# Clarification request (for unclear intents)
+CLARIFICATION_REQUEST: Dict[str, str] = {
+    "en": "I want to make sure I help you with the right information. Are you asking about our hours, services, scheduling an appointment, pricing, or our team? Please let me know what you need.",
+    "es": "Quiero asegurarme de ayudarle con la información correcta. ¿Pregunta sobre nuestro horario, servicios, programar una cita, precios o nuestro equipo? Por favor dígame qué necesita.",
+}
+
+
+# Help menu
+HELP_MENU: Dict[str, str] = {
+    "en": "I can help you with: checking our office hours, learning about our legal services, scheduling a consultation, discussing pricing, or meeting our team. What would you like to know?",
+    "es": "Puedo ayudarle con: verificar nuestro horario de oficina, conocer nuestros servicios legales, programar una consulta, discutir precios o conocer nuestro equipo. ¿Qué le gustaría saber?",
+}
+
+
+# Escalation (only after multiple failed attempts)
 ESCALATION_RESPONSE: Dict[str, str] = {
-    "en": "Let me transfer you to a team member. Please hold.",
-    "es": "Permítame transferirlo a un miembro del equipo. Por favor espere.",
+    "en": "I apologize for any confusion. Let me connect you with a team member who can better assist you. Please hold.",
+    "es": "Me disculpo por cualquier confusión. Permítame conectarlo con un miembro del equipo que pueda ayudarle mejor. Por favor espere.",
 }
 
 
@@ -98,6 +112,8 @@ def get_message(template_name: str, language: str, **kwargs) -> str:
         "STAFF_INTRO": STAFF_INTRO,
         "AVAILABILITY_QUESTION": AVAILABILITY_QUESTION,
         "UNCLEAR_RESPONSE": UNCLEAR_RESPONSE,
+        "CLARIFICATION_REQUEST": CLARIFICATION_REQUEST,
+        "HELP_MENU": HELP_MENU,
         "ESCALATION_RESPONSE": ESCALATION_RESPONSE,
         "GOODBYE": GOODBYE,
         "PRICING_RESPONSE": PRICING_RESPONSE,
