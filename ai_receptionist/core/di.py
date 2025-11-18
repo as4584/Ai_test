@@ -1,15 +1,12 @@
-from functools import lru_cache
 from typing import Dict, Optional
+import logging
 
-from ai_receptionist.core.settings import Settings
+from ai_receptionist.config.settings import Settings, get_settings
 from ai_receptionist.services.telephony.telephony import TelephonyService
 from ai_receptionist.services.telephony.twilio_service import TwilioTelephonyService
 from ai_receptionist.services.flags.service import FeatureFlagService, FeatureFlagRepository, RedisLike
 
-
-@lru_cache(maxsize=1)
-def get_settings() -> Settings:
-    return Settings()
+logger = logging.getLogger(__name__)
 
 
 def get_telephony_service(settings: Settings | None = None) -> TelephonyService:

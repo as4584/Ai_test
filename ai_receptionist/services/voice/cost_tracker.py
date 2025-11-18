@@ -28,15 +28,14 @@ class CostTracker:
     operations: List[Dict] = field(default_factory=list)
 
     def log_operation(self, op_type: str, details: str, cost: float) -> None:
-        """Log a billable operation and print to console."""
+        """Log a billable operation."""
         self.operations.append(
             {"timestamp": datetime.utcnow(), "type": op_type, "details": details, "cost": cost}
         )
         running_total = self.total_cost()
         logger.info(
-            f"[{self.call_sid}] {op_type}: {details} → ${cost:.4f} | Running total: ${running_total:.4f}"
+            f"💰 [{op_type}] {details} → ${cost:.4f} (Total so far: ${running_total:.4f})"
         )
-        print(f"💰 [{op_type}] {details} → ${cost:.4f} (Total so far: ${running_total:.4f})")
 
     def log_inbound_call(self, duration_seconds: float) -> None:
         """Log inbound call cost."""
@@ -103,9 +102,8 @@ def get_cost_tracker(call_sid: str) -> CostTracker:
 
 
 def print_call_summary(call_sid: str) -> None:
-    """Print and return the call summary."""
+    """Log the call summary."""
     tracker = _cost_sessions.get(call_sid)
     if tracker:
         summary = tracker.summary()
-        print(summary)
         logger.info(summary)

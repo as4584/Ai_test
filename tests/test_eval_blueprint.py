@@ -17,7 +17,7 @@ Copilot, when I ask for new tests, generate both:
 import json
 import pytest
 from typing import Dict, List, Any
-from src.haircut_bot import HaircutConciergeBot
+from ai_receptionist.agent import ConversationBot
 
 def load_fixture(fixture_name: str) -> Dict[str, Any]:
     """Load a JSON fixture from docs/samples/"""
@@ -25,7 +25,7 @@ def load_fixture(fixture_name: str) -> Dict[str, Any]:
     with open(fixture_path, 'r') as f:
         return json.load(f)
 
-def validate_booking_flow(bot: HaircutConciergeBot, dialogue: List[Dict], validation_rules: Dict) -> None:
+def validate_booking_flow(bot: ConversationBot, dialogue: List[Dict], validation_rules: Dict) -> None:
     """
     Core evaluation function that validates the booking flow follows proper patterns:
     1. Confirmation occurs before tool call
@@ -84,7 +84,7 @@ def sample_dialogue():
 
 def test_legacy_haircut_booking_flow(sample_dialogue):
     """Legacy test for backward compatibility"""
-    bot = HaircutConciergeBot()
+    bot = ConversationBot()
     dialogue = sample_dialogue
 
     for turn in dialogue:
@@ -103,7 +103,7 @@ def test_incomplete_booking_missing_datetime_flow():
     The assistant should clarify missing info before calling booking tool.
     """
     fixture = load_fixture("incomplete_booking_missing_datetime")
-    bot = HaircutConciergeBot()
+    bot = ConversationBot()
     
     # Validate the entire flow
     validate_booking_flow(bot, fixture["dialogue"], fixture["validation_rules"])
@@ -124,7 +124,7 @@ def test_complete_booking_with_all_details_flow():
     Should still confirm before booking.
     """
     fixture = load_fixture("complete_booking_flow")
-    bot = HaircutConciergeBot()
+    bot = ConversationBot()
     
     # Validate the entire flow
     validate_booking_flow(bot, fixture["dialogue"], fixture["validation_rules"])
@@ -142,7 +142,7 @@ def test_no_premature_booking_without_confirmation():
     """
     Eval test to ensure bot never makes booking tool calls without confirmation.
     """
-    bot = HaircutConciergeBot()
+    bot = ConversationBot()
     
     # User provides partial info but doesn't confirm
     bot.handle_user_message("I'm John and I want a haircut tomorrow at 2pm")
@@ -160,7 +160,7 @@ def test_missing_customer_name_flow():
     The assistant should ask for the missing name before proceeding.
     """
     fixture = load_fixture("missing_name_flow")
-    bot = HaircutConciergeBot()
+    bot = ConversationBot()
     
     # Validate the entire flow
     validate_booking_flow(bot, fixture["dialogue"], fixture["validation_rules"])
@@ -179,7 +179,7 @@ def test_missing_information_edge_cases():
     """
     Eval test to ensure bot properly handles missing information scenarios.
     """
-    bot = HaircutConciergeBot()
+    bot = ConversationBot()
     
     # Test missing name
     response = bot.handle_user_message("I want a haircut tomorrow at 2pm")
@@ -204,7 +204,7 @@ def test_ambiguous_datetime_request_flow():
     The assistant must clarify before proceeding with booking.
     """
     fixture = load_fixture("ambiguous_datetime_request")
-    bot = HaircutConciergeBot()
+    bot = ConversationBot()
     
     # Validate the entire flow
     validate_booking_flow(bot, fixture["dialogue"], fixture["validation_rules"])
@@ -225,7 +225,7 @@ def test_after_hours_request_flow():
     Assistant must offer alternatives within business hours.
     """
     fixture = load_fixture("after_hours_request")
-    bot = HaircutConciergeBot()
+    bot = ConversationBot()
     
     # Validate the entire flow
     validate_booking_flow(bot, fixture["dialogue"], fixture["validation_rules"])
@@ -246,7 +246,7 @@ def test_missing_service_type_flow():
     Assistant must ask for service type clarification.
     """
     fixture = load_fixture("missing_service_type")
-    bot = HaircutConciergeBot()
+    bot = ConversationBot()
     
     # Validate the entire flow
     validate_booking_flow(bot, fixture["dialogue"], fixture["validation_rules"])
@@ -266,7 +266,7 @@ def test_double_booking_conflict_flow():
     Assistant must detect conflict and offer alternatives.
     """
     fixture = load_fixture("double_booking_conflict")
-    bot = HaircutConciergeBot()
+    bot = ConversationBot()
     
     # Validate the entire flow
     validate_booking_flow(bot, fixture["dialogue"], fixture["validation_rules"])
@@ -287,7 +287,7 @@ def test_cancel_appointment_flow():
     Assistant must confirm before making cancellation tool call.
     """
     fixture = load_fixture("cancel_appointment_flow")
-    bot = HaircutConciergeBot()
+    bot = ConversationBot()
     
     # Validate the entire flow
     validate_booking_flow(bot, fixture["dialogue"], fixture["validation_rules"])
@@ -308,7 +308,7 @@ def test_reschedule_appointment_flow():
     Assistant must confirm new time and ensure no duplicate booking.
     """
     fixture = load_fixture("reschedule_appointment_flow")
-    bot = HaircutConciergeBot()
+    bot = ConversationBot()
     
     # Validate the entire flow
     validate_booking_flow(bot, fixture["dialogue"], fixture["validation_rules"])
@@ -330,7 +330,7 @@ def test_payment_security_rejection_flow():
     Assistant must reject payment info and guide to secure payment process.
     """
     fixture = load_fixture("payment_security_rejection")
-    bot = HaircutConciergeBot()
+    bot = ConversationBot()
     
     # Validate the entire flow
     validate_booking_flow(bot, fixture["dialogue"], fixture["validation_rules"])
@@ -353,7 +353,7 @@ def test_haircut_ambiguous_time_flow():
     Assistant must clarify specific datetime before booking.
     """
     fixture = load_fixture("haircut_ambiguous_time")
-    bot = HaircutConciergeBot()
+    bot = ConversationBot()
     
     # Validate the entire flow
     validate_booking_flow(bot, fixture["dialogue"], fixture["validation_rules"])
@@ -375,7 +375,7 @@ def test_haircut_after_hours_flow():
     Assistant must decline professionally and offer alternatives within business hours.
     """
     fixture = load_fixture("haircut_after_hours")
-    bot = HaircutConciergeBot()
+    bot = ConversationBot()
     
     # Validate the entire flow
     validate_booking_flow(bot, fixture["dialogue"], fixture["validation_rules"])
@@ -396,7 +396,7 @@ def test_haircut_missing_service_flow():
     Assistant must ask for service clarification before proceeding.
     """
     fixture = load_fixture("haircut_missing_service")
-    bot = HaircutConciergeBot()
+    bot = ConversationBot()
     
     # Validate the entire flow
     validate_booking_flow(bot, fixture["dialogue"], fixture["validation_rules"])
@@ -417,7 +417,7 @@ def test_haircut_conflict_propose_alt_flow():
     Assistant must detect conflict and propose exactly 2 alternatives, then book user's choice.
     """
     fixture = load_fixture("haircut_conflict_propose_alt")
-    bot = HaircutConciergeBot()
+    bot = ConversationBot()
     
     # Validate the entire flow
     validate_booking_flow(bot, fixture["dialogue"], fixture["validation_rules"])
@@ -438,7 +438,7 @@ def test_haircut_cancel_flow():
     Assistant must confirm cancellation details before making cancel tool call.
     """
     fixture = load_fixture("haircut_cancel_flow")
-    bot = HaircutConciergeBot()
+    bot = ConversationBot()
     
     # Validate the entire flow
     validate_booking_flow(bot, fixture["dialogue"], fixture["validation_rules"])
@@ -459,7 +459,7 @@ def test_haircut_reschedule_flow():
     Assistant must confirm both old and new times before making reschedule tool call.
     """
     fixture = load_fixture("haircut_reschedule_flow")
-    bot = HaircutConciergeBot()
+    bot = ConversationBot()
     
     # Validate the entire flow
     validate_booking_flow(bot, fixture["dialogue"], fixture["validation_rules"])
@@ -481,7 +481,7 @@ def test_haircut_payment_refusal_flow():
     Assistant must refuse payment info, provide security warning, and never echo PAN numbers.
     """
     fixture = load_fixture("haircut_payment_refusal")
-    bot = HaircutConciergeBot()
+    bot = ConversationBot()
     
     # Validate the entire flow  
     validate_booking_flow(bot, fixture["dialogue"], fixture["validation_rules"])

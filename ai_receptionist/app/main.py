@@ -2,13 +2,16 @@ from fastapi import FastAPI, Depends
 from fastapi.responses import JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from pathlib import Path
+import logging
 
-from ai_receptionist.core.di import get_settings
-from ai_receptionist.core.settings import Settings
+from ai_receptionist.config.settings import Settings, get_settings
 from ai_receptionist.app.api.twilio import router as twilio_router
 from ai_receptionist.app.api.admin import router as admin_router
+from ai_receptionist.api.twilio_voice import router as twilio_voice_router
 from ai_receptionist.services.voice.endpoints import router as voice_router
 from ai_receptionist.app.middleware import configure_logging, request_context_middleware
+
+logger = logging.getLogger(__name__)
 
 
 app = FastAPI(title="AI Receptionist", version="0.1.0")
@@ -38,6 +41,7 @@ def root():
 # Mount routers
 app.include_router(twilio_router)
 app.include_router(admin_router)
+app.include_router(twilio_voice_router)
 app.include_router(voice_router)
 
 # Observability: attach request id and tenant id to context and logs

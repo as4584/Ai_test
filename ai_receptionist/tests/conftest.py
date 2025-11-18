@@ -1,7 +1,8 @@
-import sys
+"""
+Pytest configuration and fixtures for ai_receptionist tests.
+"""
+
 from pathlib import Path
 
-# Ensure the ai_receptionist package root is importable regardless of CWD
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_ROOT))
+# Get project root for test fixtures
+PROJECT_ROOT = Path(__file__).parent.parent.parent

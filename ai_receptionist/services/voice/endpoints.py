@@ -4,26 +4,26 @@ Voice conversation endpoints for Twilio integration.
 Handles incoming calls, language selection, and conversation flow.
 """
 
+import logging
 from fastapi import APIRouter, Form, Request, Response
 from twilio.twiml.voice_response import VoiceResponse, Gather
-import sys
-import os
 
-# Add project root to path for call_monitor import
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__)))))
+from ai_receptionist.services.voice.business_config import BUSINESS_NAME
+from ai_receptionist.services.voice.session import get_session, clear_session
+from ai_receptionist.services.voice.cost_tracker import get_cost_tracker
+from ai_receptionist.services.voice.messages import LANGUAGE_SELECTION_COMBINED, get_message
+from ai_receptionist.services.voice.intents import detect_intent, handle_intent
 
+logger = logging.getLogger(__name__)
+
+# Optional call monitor integration
 try:
     from call_monitor import monitor
     MONITOR_ENABLED = True
 except ImportError:
     MONITOR_ENABLED = False
     monitor = None
-
-from .business_config import BUSINESS_NAME
-from .session import get_session, clear_session
-from .cost_tracker import get_cost_tracker
-from .messages import LANGUAGE_SELECTION_COMBINED, get_message
-from .intents import detect_intent, handle_intent
+    logger.debug("Call monitor not available")
 
 
 router = APIRouter(prefix="/twilio", tags=["voice"])
@@ -154,9 +154,9 @@ async def gather_input(request: Request, CallSid: str = Form(...), SpeechResult:
 
         # Log call summary
         summary = tracker.summary()
-        print("\n" + "=" * 50)
-        print(summary)
-        print("=" * 50 + "\n")
+        logger.info("\n" + "=" * 50)
+        logger.info(summary)
+        logger.info("=" * 50 + "\n")
         
         # Log call end to monitor
         if MONITOR_ENABLED and monitor:

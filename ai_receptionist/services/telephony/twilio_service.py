@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import logging
 from typing import Any, Dict, Mapping, Optional, List
 
-from ai_receptionist.core.settings import Settings
+from ai_receptionist.config.settings import Settings
 from ai_receptionist.services.telephony.telephony import TelephonyService
+
+logger = logging.getLogger(__name__)
 
 try:  # Optional import to avoid hard dependency in tests
     from twilio.request_validator import RequestValidator
