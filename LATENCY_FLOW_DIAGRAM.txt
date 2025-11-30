@@ -1,0 +1,158 @@
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                    LATENCY MEASUREMENT FLOW DIAGRAM                         │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────┐
+│   Twilio    │  Sends POST to /twilio/webhook
+│   Server    │
+└──────┬──────┘
+       │
+       │ HTTP POST (application/x-www-form-urlencoded)
+       │ Body: {From: "+1234567890", To: "+9876543210", Body: "Hello"}
+       ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  FastAPI Webhook Handler (/twilio/webhook)                                 │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  🕐 request_start = time.monotonic()  ◄──── START MEASUREMENT              │
+│     │                                                                       │
+│     ├─ Validate Twilio signature                                           │
+│     │  └─ Check X-Twilio-Signature header                                  │
+│     │                                                                       │
+│     ├─ Parse form data                                                     │
+│     │  ├─ Extract: From, To, Body/TranscriptionText                        │
+│     │  └─ Determine tenant_id from phone mapping                           │
+│     │                                                                       │
+│     ├─ Enqueue call event                                                  │
+│     │  └─ await telephony.enqueue_call(event)                              │
+│     │                                                                       │
+│     ▼                                                                       │
+│  ┌────────────────────────────────────────────────────────────────┐        │
+│  │  AI Service Call                                               │        │
+│  ├────────────────────────────────────────────────────────────────┤        │
+│  │                                                                │        │
+│  │  result = await ai_service.generate_response_with_metrics(    │        │
+│  │      user_text="Hello",                                       │        │
+│  │      context={"tenant_id": "...", "caller": "..."}            │        │
+│  │  )                                                            │        │
+│  │                                                                │        │
+│  │  ┌──────────────────────────────────────────────────────┐    │        │
+│  │  │  GeminiService.generate_response_with_metrics()      │    │        │
+│  │  ├──────────────────────────────────────────────────────┤    │        │
+│  │  │                                                       │    │        │
+│  │  │  🕐 ai_start = time.monotonic() ◄─── AI START       │    │        │
+│  │  │     │                                                │    │        │
+│  │  │     ├─ Build prompt with system message             │    │        │
+│  │  │     │  └─ Add context (business info, etc.)         │    │        │
+│  │  │     │                                                │    │        │
+│  │  │     ├─ Call Gemini API                              │    │        │
+│  │  │     │  response = await model.generate_content(...)  │    │        │
+│  │  │     │                                                │    │        │
+│  │  │     │  [Network latency + AI processing]            │    │        │
+│  │  │     │  ⏱ ~200-800ms (typical)                       │    │        │
+│  │  │     │                                                │    │        │
+│  │  │  🕐 ai_end = time.monotonic()   ◄─── AI END         │    │        │
+│  │  │     │                                                │    │        │
+│  │  │     ├─ ai_latency_ms = (ai_end - ai_start) * 1000   │    │        │
+│  │  │     │                                                │    │        │
+│  │  │     ├─ Extract token counts                         │    │        │
+│  │  │     │  ├─ Try: response.usage_metadata              │    │        │
+│  │  │     │  └─ Fallback: len(text) // 4                  │    │        │
+│  │  │     │                                                │    │        │
+│  │  │     └─ Return {                                      │    │        │
+│  │  │          "response": "I can help with that...",      │    │        │
+│  │  │          "ai_latency_ms": 456.78,                    │    │        │
+│  │  │          "input_token_count": 125,                   │    │        │
+│  │  │          "output_token_count": 87,                   │    │        │
+│  │  │          "model_name": "gemini-2.0-flash-exp"        │    │        │
+│  │  │        }                                             │    │        │
+│  │  │                                                       │    │        │
+│  │  └───────────────────────────────────────────────────────┘    │        │
+│  │                                                                │        │
+│  └────────────────────────────────────────────────────────────────┘        │
+│     │                                                                       │
+│     ├─ Calculate latencies:                                                │
+│     │  ├─ total_latency_ms = (time.monotonic() - request_start) * 1000    │
+│     │  └─ twilio_roundtrip_ms = total_latency_ms - ai_latency_ms          │
+│     │                                                                       │
+│     ├─ Log metrics:                                                        │
+│     │  await log_latency(                                                  │
+│     │      ai_latency_ms=456.78,                                           │
+│     │      total_latency_ms=523.45,                                        │
+│     │      twilio_roundtrip_ms=66.67,                                      │
+│     │      input_token_count=125,                                          │
+│     │      output_token_count=87,                                          │
+│     │      model_name="gemini-2.0-flash-exp"                               │
+│     │  )                                                                   │
+│     │  └─► Append to data/latency_logs.jsonl                               │
+│     │                                                                       │
+│     └─ Return HTTP 200 OK                                                  │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+       │
+       │ HTTP 200 OK
+       ▼
+┌─────────────┐
+│   Twilio    │  Receives response
+│   Server    │
+└─────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                         LOGGED METRICS                                      │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  data/latency_logs.jsonl ◄─── Appended asynchronously                      │
+│  ┌───────────────────────────────────────────────────────────────────────┐ │
+│  │ {                                                                     │ │
+│  │   "timestamp": "2025-11-30T15:30:45.123456Z",                        │ │
+│  │   "ai_latency_ms": 456.78,           ◄── Gemini API time             │ │
+│  │   "total_latency_ms": 523.45,        ◄── End-to-end time             │ │
+│  │   "twilio_roundtrip_ms": 66.67,      ◄── Webhook overhead            │ │
+│  │   "input_token_count": 125,          ◄── Tokens sent to AI           │ │
+│  │   "output_token_count": 87,          ◄── Tokens from AI              │ │
+│  │   "model_name": "gemini-2.0-flash-exp"                               │ │
+│  │ }                                                                     │ │
+│  └───────────────────────────────────────────────────────────────────────┘ │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                      LATENCY COMPONENT BREAKDOWN                            │
+├─────────────────────────────────────────────────────────────────────────────┤
+│                                                                             │
+│  total_latency_ms (523.45ms)                                                │
+│  ├─ twilio_roundtrip_ms (66.67ms)                                           │
+│  │  ├─ Network latency (Twilio → Server): ~30-100ms                        │
+│  │  ├─ FastAPI processing: ~10-50ms                                         │
+│  │  │  ├─ Signature validation: ~5-10ms                                     │
+│  │  │  ├─ Form parsing: ~2-5ms                                              │
+│  │  │  └─ Event queueing: ~3-10ms                                           │
+│  │  └─ Response preparation: ~5-15ms                                        │
+│  │                                                                           │
+│  └─ ai_latency_ms (456.78ms)                                                │
+│     ├─ Prompt building: ~1-5ms                                              │
+│     ├─ Gemini API call: ~200-800ms                                          │
+│     │  ├─ Network to Google: ~20-50ms                                       │
+│     │  ├─ AI processing: ~150-700ms                                         │
+│     │  └─ Response transfer: ~10-50ms                                       │
+│     └─ Token extraction: ~1-3ms                                             │
+│                                                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+MEASUREMENT ACCURACY:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✓ Using time.monotonic() - immune to system clock adjustments
+✓ Measured at precise entry/exit points
+✓ Sub-millisecond precision (rounded to 2 decimal places)
+✓ Async logging does NOT block request handling
+
+PRIVACY GUARANTEES:
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✓ NO phone numbers logged
+✓ NO user messages logged
+✓ NO AI responses logged
+✓ NO PII or conversation content
+✗ ONLY performance metrics and metadata
+
