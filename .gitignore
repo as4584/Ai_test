@@ -8,3 +8,4 @@ __pycache__/
 .venv/
 .env
 data/latency_logs.jsonl
+data/latency_matrix.json
