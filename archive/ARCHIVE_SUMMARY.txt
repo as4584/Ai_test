@@ -1,0 +1,76 @@
+Archive Summary
+===============
+Date: Sun Nov 30 15:01:18 EST 2025
+Project: AI Receptionist - Minimal Voice Pipeline Refactoring
+
+Archived Folders:
+-----------------
+Root-level:
+  - alembic/ (database migrations)
+  - data/ (sample data)
+  - docs/ (documentation)
+  - PRODUCTS/ (product specs)
+  - scripts/ (helper scripts)
+  - tests/ (root tests)
+  - tools/ (admin tools)
+  - .streamlit/ (streamlit config)
+  - .pytest_cache/ (pytest cache)
+  - .ruff_cache/ (ruff cache)
+
+Module-level (ai_receptionist/):
+  - static/ (UI components)
+  - tests/ (module tests)
+  - db/ (database layer)
+  - workers/ (background jobs)
+  - services/billing/ (billing service)
+  - services/flags/ (feature flags)
+  - agent/ (conversation bot)
+  - api/ (legacy API)
+
+Archived Files:
+---------------
+Config:
+  - alembic.ini
+  - docker-compose.dev.yml
+  - pytest.ini
+
+Documentation:
+  - COMMIT_MSG.txt
+  - EVAL_SYSTEM_README.md
+  - REFACTORING_SUMMARY.md
+  - TECHNICAL_DEBT_AUDIT.md
+  - onboarding_checklist.md
+  - pilot_agreement.md
+
+Code:
+  - call_monitor.py
+  - start_monitor.py
+  - test_improvements.py
+  - test_voice_integration.py
+  - services/rag.py
+  - services/router.py
+  - app/api/admin.py
+
+Dependencies Reduced:
+---------------------
+Before: 50+ packages
+After: 7-8 packages
+
+Removed packages:
+  - alembic, SQLAlchemy (database)
+  - redis (caching)
+  - streamlit (UI framework)
+  - openai (replaced by google-generativeai)
+  - pytest (testing)
+  - All streamlit dependencies (numpy, pandas, altair, etc.)
+  - All SQLAlchemy dependencies (greenlet, etc.)
+  - All test dependencies (pytest-json-report, pytest-metadata)
+
+Restoration:
+------------
+To restore any archived component:
+  mv archive/root/<folder_or_file> .
+  mv archive/module/<folder_or_file> ai_receptionist/
+
+To restore original requirements.txt:
+  cp archive/root/requirements.txt.original requirements.txt

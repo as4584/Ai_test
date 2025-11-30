@@ -1,20 +1,18 @@
 """
-AI Receptionist - Intelligent phone receptionist system.
+AI Receptionist - Minimal voice pipeline with Twilio and Gemini.
 
-This package provides automated phone reception capabilities
-using Twilio voice services and conversational AI.
+Provides automated phone reception capabilities using:
+- Twilio voice services
+- Gemini Flash for natural language understanding
 """
 
 __version__ = "0.2.0"
 __author__ = "AI Receptionist Team"
 
 from ai_receptionist.config import get_settings, Settings
-from ai_receptionist.agent import ConversationBot, ToolCall
 
 __all__ = [
     "get_settings",
     "Settings",
-    "ConversationBot",
-    "ToolCall",
     "__version__"
 ]
