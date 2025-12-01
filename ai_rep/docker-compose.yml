@@ -1,0 +1,32 @@
+version: '3.8'
+
+services:
+  ai-receptionist-barebones:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ai_receptionist-ai_receptionist-1 # Impersonate old container name
+    ports:
+      - "8015:8000"
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+    networks:
+      lex_net:
+        aliases:
+          - ai_receptionist # Impersonate hostname for Caddy
+    env_file:
+      - .env
+    volumes:
+      # Mount data directory for persistent metrics
+      - ./data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
+networks:
+  lex_net:
+    external: true
